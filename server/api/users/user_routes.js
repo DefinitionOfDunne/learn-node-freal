@@ -80,7 +80,7 @@ router.route('/:username')
 
         User.findOneAndUpdate({ username: req.params.username }, {
             $push: {"contacts": {name: req.body.name, method: req.body.method}},
-            safe: true, upsert: true, new : true
+            upsert: true
 
         }, function(error, user) {
             if (error) {

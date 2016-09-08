@@ -2,23 +2,23 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Dyl's Coolness Meter</title>
-
+	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
 <body>
 
-<h1> Welcome To This Express App </h1>
+<h1> Communication Tracker </h1>
 <form>
-	<input type="text" name="name" id="name">
-	<input type="submit" name='submit'>
+<form id='add-form' method="POST" action="/users">
+	<input type="text" name="firstname" id="firstname" placeholder="First Name?">
+	<input type="text" name="lastname" id="lastname" placeholder="Last Name">
+	<input type="text" name="username" id="username" placeholder="Username">
+	<input type="submit" name='submit' value="Add Yourself!">
 </form>
-
-
-<form id='delete-form' method="delete" action="/friends/remove">
-	<input type="text" name="name" id="name" placeholder="What's Your Name?">
-	<input type="submit" name='delete'>
 </form>
 
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script type="text/javascript" src="app.js"></script>
+
 </html>
