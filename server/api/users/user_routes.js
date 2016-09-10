@@ -13,16 +13,23 @@ router.use(function(req, res, next) {
 /*--------------- BREAK ---------------------------- */
 
 
+/*----- NOTE ON USING NEXT() ---------*/
+// Calls to next() and next(err) indicate that the current handler is complete 
+// and in what state. next(err) will skip all remaining handlers in the chain except 
+// for those that are set up to handle errors as described above.
+
+
 
 
 /* Main Page Route To Create User and Show All Users 
 ----------------------------------------------------*/
 
+
 router.route('/')
-    .get(function(req, res) {
-        User.find({}, function(error, users) {
-            if (error) {
-                console.log(error);
+    .get(function(req, res, next) {
+        User.find({}, function(err, users) {
+            if (err) {
+                return next(new Error ('error occured at user list GET route'));
             } else {
                 res.status(200).json(users);
             }
@@ -55,22 +62,22 @@ router.route('/')
 ----------------------------------------------------*/
 
 router.route('/:username')
-    .get(function(req, res) {
+    .get(function(req, res, next) {
         User.findOne({ username: req.params.username }, function(err, user) {
 
-            if (err) {
-                console.log(err);
+            if (!user) {
+                return next(new Error ('user does not exist'));
             } else {
                 res.status(201).json("Welcome To Your Page " + user.firstname);
             }
         })
     })
-    .delete(function(req, res) {
+    .delete(function(req, res, next) {
         User.remove({
             username: req.params.username
         }, function(err) {
-            if (err) {
-                console.log(err);
+            if (!user) {
+                return next(new Error ('cannot delete, user not found'));
             } else {
                 res.json({ message: 'User deleted!' });
             }
