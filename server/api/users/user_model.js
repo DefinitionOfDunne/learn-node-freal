@@ -3,9 +3,18 @@ var mongoose = require('mongoose');
 
 var userSchema = mongoose.Schema({
 
-    firstname: String,
-    lastname: String,
-    username: String,
+    firstname: { 
+    	type: String, 
+    	required: true 
+    },
+    lastname: { 
+    	type: String, 
+    	required: true 
+    },
+    username: { 
+    	type: String, 
+    	required: true 
+    },
     contacts: [{
         name: { type: String },
         method: { type: String }

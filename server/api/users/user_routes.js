@@ -5,20 +5,21 @@ var router = express.Router();
 var User = require('./user_model');
 
 
+
+/*------------ ROUTER-LEVEL MIDDLEWARE --------------*/
 router.use(function(req, res, next) {
-    console.log(req.method, req.url);
+    console.log('Oooh, an HTTP Request occured:', req.method, req.url);
     next();
 });
-
-/*--------------- BREAK ---------------------------- */
-
-
-/*----- NOTE ON USING NEXT() ---------*/
-// Calls to next() and next(err) indicate that the current handler is complete 
-// and in what state. next(err) will skip all remaining handlers in the chain except 
-// for those that are set up to handle errors as described above.
+/*------------------------------------------- */
 
 
+/*----- NOTES
+    1. Calls to next() and next(err) indicate that the current handler is complete 
+    and in what state. next(err) will skip all remaining handlers in the chain except 
+    for those that are set up to handle errors as described above.
+    2. app.all applies to all METHODS
+*/
 
 
 /* Main Page Route To Create User and Show All Users 
@@ -29,13 +30,15 @@ router.route('/')
     .get(function(req, res, next) {
         User.find({}, function(err, users) {
             if (err) {
-                return next(new Error ('error occured at user list GET route'));
+                var error = new Error('Unable to find this page. Sorry!');
+                report.status = 500;           
+                return next(error);
             } else {
                 res.status(200).json(users);
             }
         })
     })
-    .post(function(req, res) {
+    .post(function(req, res, next) {
 
         var user = new User();
         user.firstname = req.body.firstname;
@@ -44,9 +47,11 @@ router.route('/')
 
         user.save(function(err) {
 
-            if (err)
-
-                console.log(err);
+            if (err) {
+                var error = new Error('error occured while creating this user');
+                error.status = 400;
+                return next(error);
+            }
 
             res.json({ message: 'User created!' });
         })
@@ -64,34 +69,37 @@ router.route('/')
 router.route('/:username')
     .get(function(req, res, next) {
         User.findOne({ username: req.params.username }, function(err, user) {
-
             if (!user) {
-                return next(new Error ('user does not exist'));
+                var error = new Error('404 Error: This User Does Not Exist!');
+                error.status = 404;
+                return next(error);
             } else {
                 res.status(201).json("Welcome To Your Page " + user.firstname);
             }
         })
     })
     .delete(function(req, res, next) {
-        User.remove({
-            username: req.params.username
-        }, function(err) {
+        User.findOneAndRemove({ username: req.params.username }, function(err, user) {
             if (!user) {
-                return next(new Error ('cannot delete, user not found'));
+                var error = new Error('Unable to delete this user. Sorry!');
+                error.status = 404;
+                return next(error);
             } else {
-                res.json({ message: 'User deleted!' });
+                res.status(201).json("This User has been deleted " + user.firstname);
             }
         })
     })
-    .put(function(req, res) {
+    .put(function(req, res, next) {
 
         User.findOneAndUpdate({ username: req.params.username }, {
-            $push: {"contacts": {name: req.body.name, method: req.body.method}},
+            $push: { "contacts": { name: req.body.name, method: req.body.method } },
             upsert: true
 
-        }, function(error, user) {
-            if (error) {
-                console.log(error);
+        }, function(err, user) {
+            if (err) {
+                var error = new Error('Unable to update this user. Sorry!');
+                error.status = 500;
+                return next(error);
             } else {
                 res.status(201).json(user);
             }
