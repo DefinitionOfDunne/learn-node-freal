@@ -3,8 +3,14 @@
 var express = require('express');
 var router = express.Router();
 var User = require('./user_model');
+var signToken = require('../../auth/auth').signToken;
 
-
+// {
+// "firstname": "mike",
+// "lastname": "jonez",
+// "username": "mikejonez",
+// "password": "mike"
+// }
 
 /*------------ ROUTER-LEVEL MIDDLEWARE --------------*/
 router.use(function(req, res, next) {
@@ -31,7 +37,7 @@ router.route('/')
         User.find({}, function(err, users) {
             if (err) {
                 var error = new Error('Unable to find this page. Sorry!');
-                report.status = 500;           
+                report.status = 404;           
                 return next(error);
             } else {
                 res.status(200).json(users);
@@ -40,19 +46,24 @@ router.route('/')
     })
     .post(function(req, res, next) {
 
-        var user = new User();
-        user.firstname = req.body.firstname;
-        user.lastname = req.body.lastname;
-        user.username = req.body.username;
+        var body = req.body;
+
+        var user = new User({
+            firstname: body.firstname, 
+            lastname: body.lastname,
+            username: body.username,
+            password: body.password
+        });
 
         user.save(function(err) {
 
             if (err) {
-                var error = new Error('error occured while creating this user');
+                var error = new Error(err.message);
                 error.status = 400;
                 return next(error);
             }
-
+            var token = signToken(user._id);
+            res.json({token: token});
             res.json({ message: 'User created!' });
         })
 
@@ -107,12 +118,7 @@ router.route('/:username')
 
     });
 
-
-
-
-
 /*--------------- BREAK ---------------------------- */
-
 
 
 
