@@ -35,11 +35,11 @@ UserSchema.pre('save', function(next) {
 
 
 UserSchema.methods = {
-  // check the passwords on signin
+
   authenticate: function(plainTextPword) {
     return bcrypt.compareSync(plainTextPword, this.password);
   },
-  // hash the passwords
+
   encryptPassword: function(plainTextPword) {
     if (!plainTextPword) {
       return ''

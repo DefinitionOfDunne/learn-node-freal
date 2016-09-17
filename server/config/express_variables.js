@@ -13,9 +13,9 @@ module.exports = {
     },
 
     JWT: {
-        expireTime: 60,
+        expireTime: 24 * 60,
         secrets: {
-            jwt: process.env.JWT || 'dillybar'
+            jwt: process.env.JWT || 'gumball'
         }
-}
+    }
 }
